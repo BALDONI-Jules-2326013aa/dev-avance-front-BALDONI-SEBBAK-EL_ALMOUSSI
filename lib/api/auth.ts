@@ -11,25 +11,33 @@ export const authApi = {
         const response = await api.post('/api/login', credentials);
         const data = response.data;
 
-        // Si l'API renvoie uniquement le token
+        // Si l'API renvoie le token JWT uniquement
         if (data && data.token) {
+          // Décode le token pour récupérer les infos user (id, email, roles)
+          const payload = JSON.parse(atob(data.token.split('.')[1]));
+
+          const user = {
+            id: payload.user_id,   // selon ton payload JWT
+            email: payload.username || payload.email,
+            roles: payload.roles || [],
+          };
+
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('storedToken', data.token);
+            localStorage.setItem('storedUser', JSON.stringify(user));
+          }
+
+          return { success: true, token: data.token, user } as AuthResponse;
+        }
+
+        // Si jamais ton API renvoie un objet complet (fallback)
+        if (data && data.success) {
           if (typeof window !== 'undefined') {
             localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
           }
-          return { success: true, token: data.token } as AuthResponse;
-        }
-
-        // Si l'API renvoie l'objet complet
-        if (data && data.success) {
           return data as AuthResponse;
         }
-
-        // Gestion local storage, storedToken et storedUser
-        if (typeof window !== 'undefined' && data.token && data.user) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-
 
         throw new Error(data?.message || 'Échec de la connexion');
       },

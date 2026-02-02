@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EduLearn - Frontend Étudiant
 
-## Getting Started
+Application frontend React/Next.js pour la plateforme e-learning EduLearn.
 
-First, run the development server:
+## 🚀 Technologies
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 16** - Framework React avec App Router
+- **React 19** - Bibliothèque UI
+- **TypeScript** - Typage statique
+- **TailwindCSS 4** - Framework CSS utilitaire
+- **Axios** - Client HTTP avec intercepteurs JWT
+- **Lucide React** - Icônes
+
+## 📁 Structure du Projet
+
+```
+├── app/                          # App Router Next.js
+│   ├── (auth)/                   # Routes d'authentification
+│   │   ├── login/                # Page de connexion
+│   │   └── layout.tsx
+│   ├── (student)/                # Routes protégées étudiant
+│   │   ├── courses/              # Liste et détail des cours
+│   │   ├── quiz/                 # Passage des QCM
+│   │   ├── my-results/           # Historique des résultats
+│   │   └── layout.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx                  # Page d'accueil
+├── components/                   # Composants réutilisables
+│   ├── ui/                       # Composants UI génériques
+│   │   ├── Button.tsx
+│   │   ├── Card.tsx
+│   │   ├── Input.tsx
+│   │   ├── Loader.tsx
+│   │   ├── ProgressBar.tsx
+│   │   └── index.ts
+│   ├── layout/                   # Composants de layout
+│   │   └── Navbar.tsx
+│   ├── courses/                  # Composants liés aux cours
+│   │   ├── CourseCard.tsx
+│   │   └── CourseList.tsx
+│   ├── course-detail/            # Composants détail cours
+│   │   ├── VideoPlayer.tsx
+│   │   ├── DocumentViewer.tsx
+│   │   └── QuizCard.tsx
+│   └── quiz/                     # Composants QCM
+│       └── QuizQuestion.tsx
+├── lib/                          # Logique métier
+│   ├── api/                      # Services API
+│   │   ├── axios.ts              # Configuration Axios + JWT
+│   │   ├── auth.ts               # API authentification
+│   │   ├── courses.ts            # API cours
+│   │   ├── quiz.ts               # API QCM
+│   │   └── index.ts
+│   ├── context/                  # Contextes React
+│   │   └── AuthContext.tsx       # Gestion authentification
+│   ├── hooks/                    # Hooks personnalisés
+│   │   ├── useCourses.ts
+│   │   ├── useQuiz.ts
+│   │   └── index.ts
+│   └── types/                    # Types TypeScript
+│       └── index.ts
+└── public/                       # Assets statiques
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔧 Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Installer les dépendances
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Lancer le serveur de développement
+npm run dev
+```
 
-## Learn More
+## ⚙️ Configuration
 
-To learn more about Next.js, take a look at the following resources:
+Le fichier `.env.local` est déjà configuré :
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔐 Authentification
 
-## Deploy on Vercel
+L'application utilise JWT pour l'authentification :
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. L'utilisateur se connecte via `/login`
+2. Le token JWT est stocké dans `localStorage`
+3. Axios intercepte toutes les requêtes pour ajouter le header `Authorization: Bearer <token>`
+4. En cas de token expiré (401), l'utilisateur est redirigé vers `/login`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📱 Pages Disponibles
+
+| Route | Description |
+|-------|-------------|
+| `/` | Page d'accueil publique |
+| `/login` | Connexion utilisateur |
+| `/courses` | Liste des cours (protégée) |
+| `/courses/[id]` | Détail d'un cours avec vidéos, docs et QCM |
+| `/quiz/[id]` | Passage d'un QCM |
+| `/my-results` | Historique des résultats de QCM |
+
+## 🔌 API Endpoints Utilisés
+
+L'application communique avec le backend Symfony via ces endpoints :
+
+### Authentification
+- `POST /api/login` - Connexion
+- `POST /api/register` - Inscription
+- `GET /api/me` - Utilisateur courant
+
+### Cours
+- `GET /api/courses` - Liste des cours
+- `GET /api/courses/{id}` - Détail d'un cours (avec videos, documents, quizzes)
+
+### QCM
+- `GET /api/quizzes/{id}` - Détail d'un QCM avec questions et choix
+- `POST /api/quiz-attempts` - Soumettre une tentative
+- `GET /api/quiz-attempts/me` - Historique des tentatives
+
+## 📝 Scripts NPM
+
+```bash
+npm run dev      # Serveur de développement (http://localhost:3000)
+npm run build    # Build de production
+npm run start    # Lancer le build de production
+npm run lint     # Vérification ESLint
+```
+
+## 🏗️ Architecture
+
+L'architecture suit les bonnes pratiques React/Next.js :
+
+- **Séparation des responsabilités** : API, hooks, composants, pages
+- **Composants réutilisables** : UI atomique (Button, Card, Input)
+- **Hooks personnalisés** : Logique métier encapsulée (useCourses, useQuiz)
+- **Contexte d'authentification** : État global pour l'auth
+- **Types TypeScript** : Typage fort synchronisé avec l'API backend
+- **Intercepteurs Axios** : Gestion automatique du token JWT
+
+## 📄 License
+
+Projet académique - BUT 3 Développement Avancé

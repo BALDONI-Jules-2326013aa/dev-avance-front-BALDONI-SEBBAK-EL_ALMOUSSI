@@ -35,45 +35,49 @@ const QuizQuestion: React.FC<QuizQuestionProps> = ({
 
         {/* Choix */}
         <div className="space-y-3">
-          {question.choices.map((choice) => {
-            const isSelected = selectedChoiceId === choice.id;
+          {question.choices && question.choices.length > 0 ? (
+            question.choices.map((choice) => {
+              const isSelected = selectedChoiceId === choice.id;
 
-            return (
-              <button
-                key={choice.id}
-                onClick={() => onSelectChoice(choice.id)}
-                className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
-                  isSelected
-                    ? 'border-indigo-600 bg-indigo-50'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  {/* Radio button custom */}
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      isSelected
-                        ? 'border-indigo-600 bg-indigo-600'
-                        : 'border-gray-300'
-                    }`}
-                  >
-                    {isSelected && (
-                      <CheckCircle className="w-3 h-3 text-white" />
-                    )}
+              return (
+                <button
+                  key={choice.id}
+                  onClick={() => onSelectChoice(choice.id)}
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                    isSelected
+                      ? 'border-indigo-600 bg-indigo-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {/* Radio button custom */}
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        isSelected
+                          ? 'border-indigo-600 bg-indigo-600'
+                          : 'border-gray-300'
+                      }`}
+                    >
+                      {isSelected && (
+                        <CheckCircle className="w-3 h-3 text-white" />
+                      )}
+                    </div>
+
+                    {/* Texte du choix */}
+                    <span
+                      className={`flex-1 ${
+                        isSelected ? 'text-indigo-900 font-medium' : 'text-gray-700'
+                      }`}
+                    >
+                      {choice.label}
+                    </span>
                   </div>
-
-                  {/* Texte du choix */}
-                  <span
-                    className={`flex-1 ${
-                      isSelected ? 'text-indigo-900 font-medium' : 'text-gray-700'
-                    }`}
-                  >
-                    {choice.label}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })
+          ) : (
+            <p className="text-gray-500 text-center py-4">Aucun choix disponible</p>
+          )}
         </div>
       </CardBody>
     </Card>

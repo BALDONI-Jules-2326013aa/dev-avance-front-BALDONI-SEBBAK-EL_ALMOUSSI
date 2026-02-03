@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useCourse } from '@/lib/hooks/useCourses';
@@ -10,6 +10,9 @@ import { Card, CardBody } from '@/components/ui/Card';
 import VideoPlayer from '@/components/course-detail/VideoPlayer';
 import DocumentViewer from '@/components/course-detail/DocumentViewer';
 import QuizCard from '@/components/course-detail/QuizCard';
+import AddVideoModal from '@/components/course-detail/AddVideoModal';
+import AddDocumentModal from '@/components/course-detail/AddDocumentModal';
+import { coursesApi } from '@/lib/api/courses';
 import { useAuth } from '@/lib/context/AuthContext';
 import {
   ArrowLeft,
@@ -17,7 +20,8 @@ import {
   FileText,
   ClipboardList,
   Calendar,
-  RefreshCw
+  RefreshCw,
+  Plus
 } from 'lucide-react';
 
 export default function CourseDetailPage() {
@@ -26,6 +30,33 @@ export default function CourseDetailPage() {
   const { course, isLoading, error, refetch } = useCourse(courseId);
   const { user, isAuthenticated, logout } = useAuth();
   const isTeacher = isAuthenticated && user?.roles.includes('ROLE_PROF');
+
+  // États pour les modals
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Fonction pour ajouter une vidéo
+  const handleAddVideo = async (title: string, description: string, file: File) => {
+    setIsUploading(true);
+    try {
+      await coursesApi.uploadVideo(courseId, title, description, file);
+      await refetch();
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Fonction pour ajouter un document
+  const handleAddDocument = async (title: string, description: string, file: File) => {
+    setIsUploading(true);
+    try {
+      await coursesApi.uploadDocument(courseId, title, description, file);
+      await refetch();
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
 
   if (isLoading) {
@@ -102,11 +133,23 @@ export default function CourseDetailPage() {
         <div className="lg:col-span-2 space-y-8">
           {/* Section Vidéos */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <Video className="w-6 h-6 text-indigo-600" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                Vidéos ({course.videos?.length || 0})
-              </h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Video className="w-6 h-6 text-indigo-600" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Vidéos ({course.videos?.length || 0})
+                </h2>
+              </div>
+              {isTeacher && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<Plus className="w-4 h-4" />}
+                  onClick={() => setIsVideoModalOpen(true)}
+                >
+                  Ajouter une vidéo
+                </Button>
+              )}
             </div>
             {hasVideos ? (
               <div className="space-y-4">
@@ -126,11 +169,23 @@ export default function CourseDetailPage() {
 
           {/* Section Documents */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <FileText className="w-6 h-6 text-red-600" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                Documents ({course.documents?.length || 0})
-              </h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <FileText className="w-6 h-6 text-red-600" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Documents ({course.documents?.length || 0})
+                </h2>
+              </div>
+              {isTeacher && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<Plus className="w-4 h-4" />}
+                  onClick={() => setIsDocumentModalOpen(true)}
+                >
+                  Ajouter un document
+                </Button>
+              )}
             </div>
             {hasDocuments ? (
               <div className="space-y-3">
@@ -175,6 +230,24 @@ export default function CourseDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Modals pour les enseignants */}
+      {isTeacher && (
+        <>
+          <AddVideoModal
+            isOpen={isVideoModalOpen}
+            onClose={() => setIsVideoModalOpen(false)}
+            onSubmit={handleAddVideo}
+            isLoading={isUploading}
+          />
+          <AddDocumentModal
+            isOpen={isDocumentModalOpen}
+            onClose={() => setIsDocumentModalOpen(false)}
+            onSubmit={handleAddDocument}
+            isLoading={isUploading}
+          />
+        </>
+      )}
     </div>
   );
 }

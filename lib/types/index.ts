@@ -37,15 +37,25 @@ export interface Course {
 export interface Video {
   id: number;
   title: string;
-  url: string;
-  courseId: number;
+  url?: string;
+  fileUrl?: string;
+  fileName?: string;
+  description?: string;
+  duration?: number;
+  position?: number;
+  courseId?: number;
 }
 
 export interface Document {
   id: number;
   title: string;
   fileUrl: string;
-  courseId: number;
+  fileName?: string;
+  description?: string;
+  mimeType?: string;
+  fileSize?: number;
+  position?: number;
+  courseId?: number;
 }
 
 // Types pour les QCM

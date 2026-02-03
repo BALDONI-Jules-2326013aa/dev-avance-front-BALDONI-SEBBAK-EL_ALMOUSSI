@@ -23,8 +23,21 @@ export const useCourses = (): UseCoursesReturn => {
     try {
       const data = await coursesApi.getAll();
       setCourses(data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors du chargement des cours');
+    } catch (err) {
+      console.error('Erreur lors du chargement des cours:', err);
+      const error = err as { response?: { data?: { message?: string }; status?: number }; message?: string };
+      
+      if (error.response?.status === 404) {
+        setError('Aucun cours trouvé');
+      } else if (error.response?.status === 500) {
+        setError('Erreur serveur lors du chargement des cours');
+      } else if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else if (error.message) {
+        setError(error.message);
+      } else {
+        setError('Erreur lors du chargement des cours');
+      }
     } finally {
       setIsLoading(false);
     }

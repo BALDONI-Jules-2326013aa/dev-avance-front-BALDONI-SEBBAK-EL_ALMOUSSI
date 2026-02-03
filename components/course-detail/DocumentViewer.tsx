@@ -14,17 +14,28 @@ interface DocumentViewerProps {
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, className = '' }) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  // Construire l'URL complète si c'est un chemin relatif
+  const getFullUrl = (url: string): string => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // URL relative, ajouter le domaine du backend
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://127.0.0.1:8000';
+    return `${baseUrl}${url}`;
+  };
+
+  const fullFileUrl = getFullUrl(document.fileUrl);
   const isPDF = document.fileUrl.endsWith('.pdf');
 
   const handleDownload = () => {
-    window.open(document.fileUrl, '_blank');
+    window.open(fullFileUrl, '_blank');
   };
 
   const handlePreview = () => {
     if (isPDF) {
       setIsPreviewOpen(true);
     } else {
-      window.open(document.fileUrl, '_blank');
+      window.open(fullFileUrl, '_blank');
     }
   };
 
@@ -91,7 +102,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, className = '
             </div>
             <div className="flex-1 p-4">
               <iframe
-                src={`${document.fileUrl}#toolbar=0`}
+                src={`${fullFileUrl}#toolbar=0`}
                 className="w-full h-full rounded-lg border"
                 title={document.title}
               />

@@ -10,6 +10,7 @@ import { Card, CardBody } from '@/components/ui/Card';
 import VideoPlayer from '@/components/course-detail/VideoPlayer';
 import DocumentViewer from '@/components/course-detail/DocumentViewer';
 import QuizCard from '@/components/course-detail/QuizCard';
+import { useAuth } from '@/lib/context/AuthContext';
 import {
   ArrowLeft,
   Video,
@@ -23,6 +24,9 @@ export default function CourseDetailPage() {
   const params = useParams();
   const courseId = Number(params.id);
   const { course, isLoading, error, refetch } = useCourse(courseId);
+  const { user, isAuthenticated, logout } = useAuth();
+  const isTeacher = isAuthenticated && user?.roles.includes('ROLE_PROF');
+
 
   if (isLoading) {
     return <Loader text="Chargement du cours..." />;
@@ -42,8 +46,7 @@ export default function CourseDetailPage() {
             <Button
               variant="primary"
               onClick={refetch}
-              leftIcon={<RefreshCw className="w-4 h-4" />}
-            >
+              leftIcon={<RefreshCw className="w-4 h-4" />}>
               Réessayer
             </Button>
           </div>
@@ -61,16 +64,17 @@ export default function CourseDetailPage() {
       {/* Navigation retour */}
       <Link
         href="/courses"
-        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-      >
+        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4" />
-        Retour aux cours
       </Link>
 
       {/* En-tête du cours */}
       <Card className="mb-8">
         <div className="bg-gradient-to-br from-indigo-500 to-purple-600 px-8 py-12">
           <h1 className="text-3xl font-bold text-white mb-4">{course.title}</h1>
+          <h2 className="text-white/90">
+            ({isTeacher ? 'Vous êtes enseignant' : 'Vous êtes étudiant'})
+          </h2>
           <div className="flex items-center gap-6 text-white/80">
             {course.createdAt && (
               <div className="flex items-center gap-2">

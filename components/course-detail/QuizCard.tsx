@@ -29,8 +29,7 @@ const QuizCard: React.FC<QuizCardProps> = ({ quiz, courseId }) => {
             <Button
               variant="primary"
               size="sm"
-              rightIcon={<ArrowRight className="w-4 h-4" />}
-            >
+              rightIcon={<ArrowRight className="w-4 h-4" />}>
               Passer le QCM
             </Button>
           </Link>

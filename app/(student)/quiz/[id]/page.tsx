@@ -268,7 +268,7 @@ export default function QuizPage() {
       {/* Indicateur de questions non répondues */}
       {answeredCount < totalQuestions && isLastQuestion && (
         <p className="text-center text-sm text-amber-600 mt-4">
-          ⚠️ Veuillez répondre à toutes les questions avant de terminer
+          Veuillez répondre à toutes les questions avant de terminer
         </p>
       )}
     </div>

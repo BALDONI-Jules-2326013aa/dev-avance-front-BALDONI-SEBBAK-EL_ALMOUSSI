@@ -46,6 +46,7 @@ export default function GenerateQuizPage() {
   // État du quiz
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string | number, string>>({});
+  const [quizStartedAt, setQuizStartedAt] = useState<number | null>(null);
 
   // Résultats
   const [result, setResult] = useState<QcmSubmitResult | null>(null);
@@ -82,6 +83,7 @@ export default function GenerateQuizPage() {
         setQcm(response.qcm);
         setCurrentQuestionIndex(0);
         setAnswers({});
+        setQuizStartedAt(Date.now());
         setState('quiz');
       } else {
         setError(response.error || 'Erreur lors de la génération du QCM.');
@@ -140,6 +142,7 @@ export default function GenerateQuizPage() {
         setQcm(response.qcm);
         setCurrentQuestionIndex(0);
         setAnswers({});
+        setQuizStartedAt(Date.now());
         setState('quiz');
       } else {
         setError(response.error || 'Erreur lors de la génération du QCM.');
@@ -184,7 +187,7 @@ export default function GenerateQuizPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await quizApi.submitGeneratedQcm(qcm, answers);
+      const response = await quizApi.submitGeneratedQcm(qcm, answers, quizStartedAt || undefined);
       setResult(response);
       setState('result');
     } catch (err) {
@@ -210,12 +213,14 @@ export default function GenerateQuizPage() {
     setAnswers({});
     setResult(null);
     setError(null);
+    setQuizStartedAt(null);
   };
 
   const handleRetry = () => {
     setCurrentQuestionIndex(0);
     setAnswers({});
     setResult(null);
+    setQuizStartedAt(Date.now());
     setState('quiz');
   };
 
@@ -450,6 +455,24 @@ export default function GenerateQuizPage() {
               <p className="text-gray-600">
                 {result.correct} / {result.total} bonnes réponses
               </p>
+
+              {/* Infos de l'essai */}
+              {result.attempt && (
+                <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Temps passé</span>
+                    <p className="font-medium text-gray-900">
+                      {Math.floor(result.attempt.timeSpent / 60)}min {result.attempt.timeSpent % 60}s
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Terminé le</span>
+                    <p className="font-medium text-gray-900">
+                      {new Date(result.attempt.completedAt).toLocaleString('fr-FR')}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Détails des réponses */}

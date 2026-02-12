@@ -160,6 +160,16 @@ export interface QcmSubmitResult {
   correct: number;
   percentage: number;
   details: QcmSubmitDetail[];
+  attempt?: QcmAttemptInfo;
+}
+
+export interface QcmAttemptInfo {
+  id: number;
+  startedAt: string;
+  completedAt: string;
+  timeSpent: number;
+  isPassed: boolean;
+  score: number;
 }
 
 export interface QcmSubmitDetail {

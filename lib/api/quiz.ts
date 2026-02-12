@@ -68,11 +68,13 @@ export const quizApi = {
    */
   submitGeneratedQcm: async (
     qcm: GeneratedQcm,
-    answers: Record<string | number, string>
+    answers: Record<string | number, string>,
+    startedAt?: number
   ): Promise<QcmSubmitResult> => {
     const response = await api.post<QcmSubmitResult>('/api/qcm/submit', {
       qcm,
       answers,
+      startedAt,
     });
     return response.data;
   },

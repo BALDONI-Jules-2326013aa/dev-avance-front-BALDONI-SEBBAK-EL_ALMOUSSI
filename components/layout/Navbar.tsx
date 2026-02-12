@@ -11,7 +11,8 @@ import {
   LogOut,
   Menu,
   X,
-  User
+  User,
+  FileQuestion
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
@@ -23,6 +24,7 @@ const Navbar: React.FC = () => {
 
   const navigation = [
     { name: 'Cours', href: '/courses', icon: BookOpen },
+    { name: 'Générer QCM', href: '/quiz/generate', icon: FileQuestion },
     { name: 'Mes résultats', href: '/my-results', icon: ClipboardList },
   ];
 

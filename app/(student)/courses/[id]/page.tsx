@@ -21,7 +21,8 @@ import {
   ClipboardList,
   Calendar,
   RefreshCw,
-  Plus
+  Plus,
+  Sparkles
 } from 'lucide-react';
 
 export default function CourseDetailPage() {
@@ -213,19 +214,26 @@ export default function CourseDetailPage() {
                 QCM disponibles ({course.quizzes?.length || 0})
               </h2>
             </div>
-            {hasQuizzes ? (
-              <div className="space-y-4">
-                {course.quizzes?.map((quiz) => (
-                  <QuizCard key={quiz.id} quiz={quiz} courseId={course.id} />
-                ))}
-              </div>
-            ) : (
-              <Card>
-                <CardBody className="text-center py-8">
-                  <ClipboardList className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">Aucun QCM disponible pour ce cours</p>
-                </CardBody>
-              </Card>
+
+            {/* Bouton Générer QCM par IA */}
+            {hasDocuments && (
+              <Link href={`/quiz/generate?courseId=${course.id}`}>
+                <Card hover className="mb-4 bg-gradient-to-r from-indigo-500 to-purple-600 border-0">
+                  <CardBody>
+                    <div className="flex items-center gap-3 text-white">
+                      <div className="p-2 bg-white/20 rounded-lg">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold">Générer un QCM par IA</h4>
+                        <p className="text-sm text-white/80">
+                          À partir des {course.documents?.length} document(s)
+                        </p>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Link>
             )}
           </div>
         </div>

@@ -122,3 +122,54 @@ export interface CreateQuiz {
   title: string;
   courseId: number;
 }
+
+// Types pour la génération de QCM via IA
+export interface GeneratedQcmQuestion {
+  id: number | string;
+  text: string;
+  options: GeneratedQcmOption[];
+  correct: string[];
+  explanation?: string | null;
+}
+
+export interface GeneratedQcmOption {
+  id: string;
+  text: string;
+}
+
+export interface GeneratedQcm {
+  title: string;
+  quiz_id?: number;
+  questions: GeneratedQcmQuestion[];
+  meta?: {
+    source_file?: string;
+    nb_questions?: number;
+    nb_options?: number;
+    answer_type?: string;
+  };
+}
+
+export interface GenerateQcmResponse {
+  success: boolean;
+  qcm: GeneratedQcm;
+  error?: string;
+}
+
+export interface QcmSubmitResult {
+  total: number;
+  correct: number;
+  percentage: number;
+  details: QcmSubmitDetail[];
+}
+
+export interface QcmSubmitDetail {
+  id: number | string;
+  text: string;
+  expected: string[];
+  expected_text: string[];
+  given: string[];
+  given_text: string[];
+  is_correct: boolean;
+  explanation?: string | null;
+}
+

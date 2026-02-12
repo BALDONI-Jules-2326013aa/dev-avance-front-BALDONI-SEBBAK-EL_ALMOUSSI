@@ -211,7 +211,7 @@ export default function CourseDetailPage() {
             <div className="flex items-center gap-3 mb-4">
               <ClipboardList className="w-6 h-6 text-green-600" />
               <h2 className="text-xl font-semibold text-gray-900">
-                QCM disponibles ({course.quizzes?.length || 0})
+                QCM disponible(s)
               </h2>
             </div>
 

@@ -80,9 +80,18 @@ export interface Choice {
 // Types pour les tentatives de QCM
 export interface QuizAttempt {
   id: number;
-  quizId: number;
+  quiz: {
+    id: number;
+    title: string;
+    courseId?: number;
+  };
   score: number;
-  createdAt: string;
+  correctAnswers: number;
+  totalQuestions: number;
+  isPassed: boolean;
+  startedAt: string;
+  completedAt?: string;
+  timeSpent?: number;
 }
 
 export interface QuizAttemptResult {

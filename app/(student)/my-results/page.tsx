@@ -41,19 +41,22 @@ export default function MyResultsPage() {
     );
   }
 
-  // Calcul des statistiques (score n'est pas un pourcentage dans l'API)
+  // Calcul des statistiques
   const totalAttempts = attempts.length;
-  const totalScore = attempts.reduce((acc, a) => acc + a.score, 0);
+  const averageScore = totalAttempts > 0
+    ? Math.round(attempts.reduce((acc, a) => acc + a.score, 0) / totalAttempts)
+    : 0;
+  const passedCount = attempts.filter(a => a.isPassed).length;
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "text-green-600 bg-green-50";
-    if (score >= 5) return "text-yellow-600 bg-yellow-50";
+    if (score >= 70) return "text-green-600 bg-green-50";
+    if (score >= 50) return "text-yellow-600 bg-yellow-50";
     return "text-red-600 bg-red-50";
   };
 
   const getScoreIcon = (score: number) => {
-    if (score >= 8) return <TrendingUp className="w-5 h-5" />;
-    if (score >= 5) return <Minus className="w-5 h-5" />;
+    if (score >= 70) return <TrendingUp className="w-5 h-5" />;
+    if (score >= 50) return <Minus className="w-5 h-5" />;
     return <TrendingDown className="w-5 h-5" />;
   };
 
@@ -66,12 +69,12 @@ export default function MyResultsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Mes résultats</h1>
         </div>
         <p className="text-gray-600">
-          Consultez l'historique de vos QCM et suivez votre progression
+          Consultez l&apos;historique de vos QCM et suivez votre progression
         </p>
       </div>
 
       {/* Statistiques globales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card>
           <CardBody className="text-center">
             <div className="text-4xl font-bold text-indigo-600 mb-1">
@@ -83,9 +86,17 @@ export default function MyResultsPage() {
         <Card>
           <CardBody className="text-center">
             <div className="text-4xl font-bold text-green-600 mb-1">
-              {totalScore}
+              {averageScore}%
             </div>
-            <p className="text-gray-600">Points totaux</p>
+            <p className="text-gray-600">Score moyen</p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody className="text-center">
+            <div className="text-4xl font-bold text-purple-600 mb-1">
+              {passedCount}/{totalAttempts}
+            </div>
+            <p className="text-gray-600">QCM réussis</p>
           </CardBody>
         </Card>
       </div>
@@ -96,7 +107,7 @@ export default function MyResultsPage() {
           <CardBody className="text-center py-16">
             <Trophy className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Aucun résultat pour l'instant
+              Aucun résultat pour l&apos;instant
             </h3>
             <p className="text-gray-500 mb-6">
               Passez votre premier QCM pour voir vos résultats ici
@@ -123,36 +134,58 @@ export default function MyResultsPage() {
                       )}`}
                     >
                       {getScoreIcon(attempt.score)}
-                      <span className="text-2xl font-bold">{attempt.score}</span>
+                      <span className="text-2xl font-bold">{Math.round(attempt.score)}%</span>
                     </div>
 
                     {/* Infos */}
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">
-                        QCM #{attempt.quizId}
+                        {attempt.quiz.title}
                       </h3>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
                           <Trophy className="w-4 h-4" />
-                          <span>Score: {attempt.score}</span>
+                          <span>{attempt.correctAnswers}/{attempt.totalQuestions} bonnes réponses</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
                           <span>
-                            {new Date(attempt.createdAt).toLocaleDateString(
-                              "fr-FR",
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }
-                            )}
+                            {attempt.completedAt
+                              ? new Date(attempt.completedAt).toLocaleDateString("fr-FR", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  timeZone: "Europe/Paris"
+                                })
+                              : new Date(attempt.startedAt).toLocaleDateString("fr-FR", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  timeZone: "Europe/Paris"
+                                })
+                            }
                           </span>
                         </div>
+                        {attempt.timeSpent && (
+                          <span className="text-gray-400">
+                            ({Math.floor(attempt.timeSpent / 60)}min {attempt.timeSpent % 60}s)
+                          </span>
+                        )}
                       </div>
                     </div>
+                  </div>
+
+                  {/* Badge réussi/échoué */}
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    attempt.isPassed 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {attempt.isPassed ? 'Réussi' : 'Échoué'}
                   </div>
                 </div>
               </CardBody>
